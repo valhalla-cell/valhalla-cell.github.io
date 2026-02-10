@@ -311,12 +311,12 @@ function resolveCollision(objx, objy, objw, objh) {
       //bottom collision
       collisionDirection = "bottom";
       player.y = player.y + originy + 1;
-      player.speedY = 0;
+      player.speedY *= -bounceFactorY;
     } else {
       //top collision
       collisionDirection = "top";
       player.y = player.y - originy;
-      player.speedY = 0;
+      player.speedY *= -bounceFactorY;
       player.onGround = true;
     }
   } else {
@@ -324,12 +324,12 @@ function resolveCollision(objx, objy, objw, objh) {
       //left collision
       collisionDirection = "left";
       player.x = player.x + originx;
-      player.speedX = 0;
+      player.speedX *= -bounceFactorX;
     } else {
       //right collision
       collisionDirection = "right";
       player.x = player.x - originx;
-      player.speedX = 0;
+      player.speedX *= -bounceFactorX;
     }
   }
 
@@ -588,13 +588,25 @@ function drawCollectables() {
   for (var i = 0; i < collectables.length; i++) {
     if (collectables[i].collected !== true) {
       //draw on screen if not collected
-      ctx.drawImage(
-        collectables[i].image,
-        collectables[i].x,
-        collectables[i].y,
-        collectableWidth,
-        collectableHeight
-      );
+      if (collectables[i].type === 'diamond') {
+        // Draw a blue diamond shape
+        ctx.fillStyle = '#1e90ff'; // Dodger blue
+        ctx.beginPath();
+        ctx.moveTo(collectables[i].x + collectableWidth / 2, collectables[i].y); // top point
+        ctx.lineTo(collectables[i].x + collectableWidth, collectables[i].y + collectableHeight / 2); // right point
+        ctx.lineTo(collectables[i].x + collectableWidth / 2, collectables[i].y + collectableHeight); // bottom point
+        ctx.lineTo(collectables[i].x, collectables[i].y + collectableHeight / 2); // left point
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        ctx.drawImage(
+          collectables[i].image,
+          collectables[i].x,
+          collectables[i].y,
+          collectableWidth,
+          collectableHeight
+        );
+      }
     } else {
       //draw the icons at the top if collected
       if (collectables[i].alpha > 0.4) {
@@ -641,6 +653,24 @@ function drawCollectables() {
         //bottom of collectable is below top of platform
         collectables[i].y = collectables[i].y - collectables[i].speedY;
         collectables[i].speedY *= -collectables[i].bounce;
+      }
+    }
+
+    // Check for collision with bad platforms - if a diamond hits one, remove it
+    for (var j = 0; j < badPlatforms.length; j++) {
+      if (
+        collectables[i] &&
+        collectables[i].x + collectableWidth > badPlatforms[j].x &&
+        collectables[i].x < badPlatforms[j].x + badPlatforms[j].width &&
+        collectables[i].y < badPlatforms[j].y + badPlatforms[j].height &&
+        collectables[i].y + collectableHeight > badPlatforms[j].y
+      ) {
+        // If it's a diamond, remove it
+        if (collectables[i].type === 'diamond') {
+          collectables.splice(i, 1);
+          i--; // adjust index because we removed current item
+          break;
+        }
       }
     }
   }
@@ -848,6 +878,7 @@ function createCollectable(
     image.src = collectableList[type].image;
     image.id = "image" + collectables.length;
     collectables.push({
+      type,
       image,
       x,
       y,

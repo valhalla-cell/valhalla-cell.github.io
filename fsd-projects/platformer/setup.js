@@ -5,6 +5,9 @@ const friction = 1.5; // how much the player is slowed each frame
 const maxSpeed = 8; // maximum horizontal speed, not vertical
 const playerJumpStrength = 12; // this is subtracted from the speedY each jump
 const projectileSpeed = 8; // the speed of projectiles
+const bounceFactorWalls = 0.85; // how much velocity is retained when bouncing off walls (1 = perfect bounce, 0 = no bounce)
+const bounceFactorX = 0.85; // bounce factor for horizontal walls
+const bounceFactorY = 0.85; // bounce factor for vertical walls
 let shouldDrawGrid = false;
 let gridMade = false;
 
@@ -18,7 +21,7 @@ const playerScale = 0.8; //makes the player just a bit smaller. Doesn't affect t
 
 // Player variables
 const player = {
-  x: 50,
+  x: 200,
   y: 100,
   speedX: 0,
   speedY: 0,
