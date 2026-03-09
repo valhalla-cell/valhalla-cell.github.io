@@ -46,14 +46,15 @@ $(function () {
 
 
     // TODO 3 - Create Collectables
-createCollectable("diamond",900,250,30,30)
-
+    createCollectable("diamond",550,150)
+    createCollectable("diamond",1370,520);
+    createCollectable("diamond",950,200)
 
     
     // TODO 4 - Create Cannons
     createCannon("left",650,0.1)
     createCannon("left",50,2500)
-
+    createCannon("top",1300,3000)
     
     
     //////////////////////////////////
